@@ -1,5 +1,5 @@
 const Task = require('../models/Task');
-const { createTaskSchema } = require('../validators/taskValidators');
+const { createTaskSchema, updateTaskSchema } = require('../validators/taskValidators');
 
 const createTask = async (req, res) => {
   try {
@@ -67,8 +67,75 @@ const getTaskById = async (req, res) => {
   }
 };
 
+const updateTask = async (req, res) => {
+  try {
+    const { error, value } = updateTaskSchema.validate(req.body, {
+      abortEarly: false
+    });
+
+    if (error) {
+      return res.status(400).json({
+        message: 'Datos no válidos',
+        errors: error.details.map((detail) => detail.message)
+      });
+    }
+
+    const task = await Task.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        user: req.user._id
+      },
+      value,
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if (!task) {
+      return res.status(404).json({
+        message: 'Tarea no encontrada'
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Tarea actualizada correctamente',
+      task
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
+const deleteTask = async (req, res) => {
+  try {
+    const task = await Task.findOneAndDelete({
+      _id: req.params.id,
+      user: req.user._id
+    });
+
+    if (!task) {
+      return res.status(404).json({
+        message: 'Tarea no encontrada'
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Tarea eliminada correctamente'
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
 module.exports = {
   createTask,
   getTasks,
-  getTaskById
+  getTaskById,
+  updateTask,
+  deleteTask
 };
