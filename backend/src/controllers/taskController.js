@@ -1,6 +1,10 @@
 const Task = require('../models/Task');
 const { createTaskSchema, updateTaskSchema } = require('../validators/taskValidators');
 
+const escapeRegex = (text) => {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+};
+
 const createTask = async (req, res) => {
   try {
     const { error, value } = createTaskSchema.validate(req.body, {
@@ -32,7 +36,25 @@ const createTask = async (req, res) => {
 
 const getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find({ user: req.user._id }).sort({ createdAt: -1 });
+    const { search, tag, completed } = req.query;
+
+    const filter = {
+      user: req.user._id
+    };
+
+    if (search) {
+      filter.title = { $regex: escapeRegex(search), $options: 'i' };
+    }
+
+    if (tag) {
+      filter.tags = { $regex: escapeRegex(tag), $options: 'i' };
+    }
+
+    if (completed !== undefined) {
+      filter.completed = completed === 'true';
+    }
+
+    const tasks = await Task.find(filter).sort({ createdAt: -1 });
 
     return res.status(200).json({
       tasks
