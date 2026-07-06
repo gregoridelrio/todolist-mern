@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { registerSchema } = require('../validators/authValidators');
+const { registerSchema, loginSchema } = require('../validators/authValidators');
 
 const register = async (req, res) => {
   try {
@@ -56,6 +56,60 @@ const register = async (req, res) => {
   }
 };
 
+const login = async (req, res) => {
+  try {
+    const { error, value } = loginSchema.validate(req.body, {
+      abortEarly: false
+    });
+
+    if (error) {
+      return res.status(400).json({
+        message: 'Datos no válidos',
+        errors: error.details.map((detail) => detail.message)
+      });
+    }
+
+    const { email, password } = value;
+
+    const user = await User.findOne({ email }).select('+password');
+
+    if (!user) {
+      return res.status(401).json({
+        message: 'Credenciales inválidas'
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        message: 'Credenciales inválidas'
+      });
+    }
+
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    return res.status(200).json({
+      message: 'Login correcto',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
 module.exports = {
-  register
+  register,
+  login
 };
