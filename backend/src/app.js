@@ -15,4 +15,17 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
+app.use((req, res) => {
+  res.status(404).json({ message: 'Ruta no encontrada' });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+
+  const status = err.status || 500;
+  const message = err.status ? err.message : 'Error interno del servidor';
+
+  res.status(status).json({ message });
+});
+
 module.exports = app;
