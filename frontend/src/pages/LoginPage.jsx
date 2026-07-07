@@ -57,6 +57,7 @@ function LoginPage() {
               id="email"
               type="email"
               name="email"
+              required
               value={formData.email}
               onChange={handleChange}
               className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 outline-none focus:border-cyan-400"
@@ -72,6 +73,8 @@ function LoginPage() {
               id="password"
               type="password"
               name="password"
+              required
+              minLength={6}
               value={formData.password}
               onChange={handleChange}
               className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 outline-none focus:border-cyan-400"
