@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import TasksPage from './pages/TasksPage'
+import NotFoundPage from './pages/NotFoundPage'
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </AuthProvider>
   )
