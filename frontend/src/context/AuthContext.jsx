@@ -2,11 +2,18 @@ import { createContext, useContext, useMemo, useState } from 'react'
 
 const AuthContext = createContext()
 
+const getStoredUser = () => {
+  try {
+    const stored = localStorage.getItem('user')
+    return stored ? JSON.parse(stored) : null
+  } catch {
+    return null
+  }
+}
+
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('token') || null)
-  const [user, setUser] = useState(
-    JSON.parse(localStorage.getItem('user')) || null
-  )
+  const [user, setUser] = useState(getStoredUser)
 
   const login = (token, user) => {
     localStorage.setItem('token', token)
