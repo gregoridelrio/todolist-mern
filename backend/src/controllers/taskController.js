@@ -5,65 +5,13 @@ const escapeRegex = (text) => {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 };
 
-const createTask = async (req, res) => {
-  try {
-    const { error, value } = createTaskSchema.validate(req.body, {
-      abortEarly: false
-    });
-
-    if (error) {
-      return res.status(400).json({
-        message: 'Datos no válidos',
-        errors: error.details.map((detail) => detail.message)
-      });
-    }
-
-    const task = await Task.create({
-      ...value,
-      user: req.user._id
-    });
-
-    return res.status(201).json({
-      message: 'Tarea creada correctamente',
-      task
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: 'Error interno del servidor'
-    });
+const handleControllerError = (error, res) => {
+  if (error.name === 'CastError') {
+    return res.status(400).json({ message: 'ID de tarea no válido' });
   }
-};
 
-const getTasks = async (req, res) => {
-  try {
-    const { search, tag, completed } = req.query;
-
-    const filter = {
-      user: req.user._id
-    };
-
-    if (search) {
-      filter.title = { $regex: escapeRegex(search), $options: 'i' };
-    }
-
-    if (tag) {
-      filter.tags = { $regex: escapeRegex(tag), $options: 'i' };
-    }
-
-    if (completed !== undefined) {
-      filter.completed = completed === 'true';
-    }
-
-    const tasks = await Task.find(filter).sort({ createdAt: -1 });
-
-    return res.status(200).json({
-      tasks
-    });
-  } catch (error) {
-    return res.status(500).json({
-      message: 'Error interno del servidor'
-    });
-  }
+  console.error(error);
+  return res.status(500).json({ message: 'Error interno del servidor' });
 };
 
 const getTaskById = async (req, res) => {
@@ -83,9 +31,7 @@ const getTaskById = async (req, res) => {
       task
     });
   } catch (error) {
-    return res.status(500).json({
-      message: 'Error interno del servidor'
-    });
+    return handleControllerError(error, res);
   }
 };
 
@@ -125,9 +71,7 @@ const updateTask = async (req, res) => {
       task
     });
   } catch (error) {
-    return res.status(500).json({
-      message: 'Error interno del servidor'
-    });
+    return handleControllerError(error, res);
   }
 };
 
@@ -148,9 +92,7 @@ const deleteTask = async (req, res) => {
       message: 'Tarea eliminada correctamente'
     });
   } catch (error) {
-    return res.status(500).json({
-      message: 'Error interno del servidor'
-    });
+    return handleControllerError(error, res);
   }
 };
 
