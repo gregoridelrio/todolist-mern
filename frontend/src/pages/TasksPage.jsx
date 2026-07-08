@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getTasks, createTask, deleteTask } from '../services/taskService'
+import { getTasks, createTask, deleteTask, updateTask } from '../services/taskService'
 import TaskList from '../components/tasks/TaskList'
 import TaskForm from '../components/tasks/TaskForm'
 import Header from '../components/Header'
@@ -42,6 +42,23 @@ function TasksPage() {
     }
   }
 
+  const handleToggleComplete = async (task) => {
+    const previousTasks = tasks
+
+    setTasks((prevTasks) =>
+      prevTasks.map((t) =>
+        t._id === task._id ? { ...t, completed: !t.completed } : t
+      )
+    )
+
+    try {
+      await updateTask(task._id, { completed: !task.completed })
+    } catch (err) {
+      setTasks(previousTasks)
+      setError(err.response?.data?.message || 'Error al actualizar la tarea')
+    }
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <Header />
@@ -59,7 +76,13 @@ function TasksPage() {
             </p>
           )}
 
-          {!loading && !error && <TaskList tasks={tasks} onDelete={handleDeleteTask} />}
+          {!loading && !error && (
+            <TaskList
+              tasks={tasks}
+              onDelete={handleDeleteTask}
+              onToggleComplete={handleToggleComplete}
+            />
+          )}
         </div>
       </main>
     </div>

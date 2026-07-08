@@ -13,3 +13,8 @@ export const createTask = async (taskData) => {
 export const deleteTask = async (taskId) => {
   await api.delete(`/tasks/${taskId}`)
 }
+
+export const updateTask = async (taskId, taskData) => {
+  const response = await api.put(`/tasks/${taskId}`, taskData)
+  return response.data.task
+}
