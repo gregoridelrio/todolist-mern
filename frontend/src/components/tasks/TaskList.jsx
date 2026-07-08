@@ -1,6 +1,6 @@
 import TaskItem from './TaskItem'
 
-function TaskList({ tasks }) {
+function TaskList({ tasks, onDelete }) {
   if (tasks.length === 0) {
     return (
       <p className="text-center text-slate-400">
@@ -12,7 +12,7 @@ function TaskList({ tasks }) {
   return (
     <ul className="space-y-3">
       {tasks.map((task) => (
-        <TaskItem key={task._id} task={task} />
+        <TaskItem key={task._id} task={task} onDelete={onDelete} />
       ))}
     </ul>
   )
