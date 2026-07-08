@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getTasks } from '../services/taskService'
 import TaskList from '../components/tasks/TaskList'
+import Header from '../components/Header'
 
 function TasksPage() {
   const [tasks, setTasks] = useState([])
@@ -23,21 +24,24 @@ function TasksPage() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white px-6 py-12">
-      <div className="mx-auto max-w-2xl">
-        <h1 className="mb-6 text-3xl font-bold text-cyan-400">Mis tareas</h1>
+    <div className="min-h-screen bg-slate-950 text-white">
+      <Header />
+      <main className="px-6 py-12">
+        <div className="mx-auto max-w-2xl">
+          <h1 className="mb-6 text-3xl font-bold text-cyan-400">Mis tareas</h1>
 
-        {loading && <p className="text-slate-400">Cargando tareas...</p>}
+          {loading && <p className="text-slate-400">Cargando tareas...</p>}
 
-        {error && (
-          <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-            {error}
-          </p>
-        )}
+          {error && (
+            <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              {error}
+            </p>
+          )}
 
-        {!loading && !error && <TaskList tasks={tasks} />}
-      </div>
-    </main>
+          {!loading && !error && <TaskList tasks={tasks} />}
+        </div>
+      </main>
+    </div>
   )
 }
 
