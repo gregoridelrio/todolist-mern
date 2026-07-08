@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
-import { getTasks } from '../services/taskService'
+import { getTasks, createTask } from '../services/taskService'
 import TaskList from '../components/tasks/TaskList'
+import TaskForm from '../components/tasks/TaskForm'
 import Header from '../components/Header'
 
 function TasksPage() {
@@ -23,12 +24,19 @@ function TasksPage() {
     fetchTasks()
   }, [])
 
+  const handleCreateTask = async (taskData) => {
+    const newTask = await createTask(taskData)
+    setTasks((prevTasks) => [newTask, ...prevTasks])
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <Header />
       <main className="px-6 py-12">
         <div className="mx-auto max-w-2xl">
           <h1 className="mb-6 text-3xl font-bold text-cyan-400">Mis tareas</h1>
+
+          <TaskForm onCreate={handleCreateTask} />
 
           {loading && <p className="text-slate-400">Cargando tareas...</p>}
 
