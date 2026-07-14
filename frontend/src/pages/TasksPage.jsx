@@ -59,6 +59,13 @@ function TasksPage() {
     }
   }
 
+  const handleUpdateTask = async (taskId, taskData) => {
+    const updated = await updateTask(taskId, taskData)
+    setTasks((prevTasks) =>
+      prevTasks.map((t) => (t._id === taskId ? updated : t))
+    )
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-white">
       <Header />
@@ -81,6 +88,7 @@ function TasksPage() {
               tasks={tasks}
               onDelete={handleDeleteTask}
               onToggleComplete={handleToggleComplete}
+              onUpdate={handleUpdateTask}
             />
           )}
         </div>
