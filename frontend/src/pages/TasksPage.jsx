@@ -2,17 +2,21 @@ import { useEffect, useState } from 'react'
 import { getTasks, createTask, deleteTask, updateTask } from '../services/taskService'
 import TaskList from '../components/tasks/TaskList'
 import TaskForm from '../components/tasks/TaskForm'
+import TaskFilters from '../components/tasks/TaskFilters'
 import Header from '../components/Header'
 
 function TasksPage() {
   const [tasks, setTasks] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [filters, setFilters] = useState({ search: '', tag: '', completed: '' })
 
   useEffect(() => {
     const fetchTasks = async () => {
+      setError('')
+
       try {
-        const data = await getTasks()
+        const data = await getTasks(filters)
         setTasks(data)
       } catch (err) {
         setError(err.response?.data?.message || 'Error al cargar las tareas')
@@ -21,8 +25,10 @@ function TasksPage() {
       }
     }
 
-    fetchTasks()
-  }, [])
+    const debounceId = setTimeout(fetchTasks, 300)
+
+    return () => clearTimeout(debounceId)
+  }, [filters])
 
   const handleCreateTask = async (taskData) => {
     const newTask = await createTask(taskData)
@@ -74,6 +80,8 @@ function TasksPage() {
           <h1 className="mb-6 text-3xl font-bold text-cyan-400">Mis tareas</h1>
 
           <TaskForm onCreate={handleCreateTask} />
+
+          <TaskFilters filters={filters} onChange={setFilters} />
 
           {loading && <p className="text-slate-400">Cargando tareas...</p>}
 
